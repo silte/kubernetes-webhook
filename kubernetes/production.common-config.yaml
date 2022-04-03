@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: webhook-cd
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-environment-secret
+  namespace: webhook-cd
+type: Opaque
+stringData:
+  FINANCER_ROLLOUT_ACCESS_TOKEN_DEV: 'secret-token'
