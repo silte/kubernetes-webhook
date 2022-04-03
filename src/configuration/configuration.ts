@@ -1,4 +1,8 @@
 export const configuration = () => ({
+  kubernetes: {
+    configFile: process.env.KUBECONFIG,
+    isInCluster: process.env.IS_IN_KUBERNETES_CLUSTER?.toLowerCase() === 'true',
+  },
   financer: {
     rollout: {
       accessToken: {
