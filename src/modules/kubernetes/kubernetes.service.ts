@@ -51,6 +51,8 @@ export class KubernetesService {
       { headers: { 'content-type': 'application/json-patch+json' } },
     );
 
-    return body;
+    return {
+      message: 'Deployment rolled out',
+    };
   }
 }
