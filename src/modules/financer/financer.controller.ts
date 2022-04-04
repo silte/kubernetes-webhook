@@ -19,7 +19,6 @@ export class FinancerController {
     return this.financerService.handleRolloutDevDeployment(authorization);
   }
 
-  @Get('/webhook')
   @Post('/webhook')
   async webhook(@Body() body: any) {
     console.log(body);
