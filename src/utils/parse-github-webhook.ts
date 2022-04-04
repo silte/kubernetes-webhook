@@ -20,7 +20,7 @@ export const isValidGithubWebhookBodyHash = (
   const stringBody = typeof body === 'string' ? body : JSON.stringify(body);
 
   const hashToCompare = crypto
-    .createHmac('sha1', hashToken)
+    .createHmac('sha256', hashToken)
     .update(stringBody)
     .digest('hex');
 
