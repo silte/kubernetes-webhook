@@ -6,7 +6,10 @@ export const configuration = () => ({
   financer: {
     accessToken: {
       webhook: process.env.FINANCER_ACCESS_TOKEN_WEBHOOK,
-      rollout: { dev: process.env.FINANCER_ACCESS_TOKEN_ROLLOUT_DEV },
+      rollout: {
+        dev: process.env.FINANCER_ACCESS_TOKEN_ROLLOUT_DEV,
+        prod: process.env.FINANCER_ACCESS_TOKEN_ROLLOUT_PROD,
+      },
     },
   },
 });

@@ -11,4 +11,6 @@ metadata:
   namespace: webhook-cd
 type: Opaque
 stringData:
-  FINANCER_ROLLOUT_ACCESS_TOKEN_DEV: 'secret-token'
+  FINANCER_ACCESS_TOKEN_ROLLOUT_DEV: secret-token
+  FINANCER_ACCESS_TOKEN_ROLLOUT_PROD: secret-token
+  FINANCER_ACCESS_TOKEN_WEBHOOK: secret-token

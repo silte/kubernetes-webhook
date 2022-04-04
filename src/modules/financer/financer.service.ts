@@ -18,6 +18,18 @@ export class FinancerService {
     private kubernetesService: KubernetesService,
   ) {}
 
+  async handleRolloutProdDeployment(authorizationToken: string) {
+    const accessToken = this.configService.get<string>(
+      'financer.accessToken.rollout.prod',
+    );
+
+    if (authorizationToken !== accessToken) {
+      throw new UnauthorizedException('Incorrect authorization header');
+    }
+
+    return this.rolloutProdDeployment();
+  }
+
   async handleRolloutDevDeployment(authorizationToken: string) {
     const accessToken = this.configService.get<string>(
       'financer.accessToken.rollout.dev',
@@ -31,7 +43,8 @@ export class FinancerService {
   }
 
   async handleWebhook(contentHash: string, body: any) {
-    const targetWorkflowSource = '.github/workflows/publish-docker.yaml';
+    const devWorkflowSource = '.github/workflows/publish-docker.yaml';
+    const prodWorkflowSource = '.github/workflows/validate-main-branches.yml';
     const accessToken = this.configService.get<string>(
       'financer.accessToken.webhook',
     );
@@ -58,13 +71,6 @@ export class FinancerService {
       throw new BadRequestException('Required fields are missing.');
     }
 
-    if (workflowSource !== targetWorkflowSource) {
-      return {
-        status: 'skipped',
-        message: `Workflow source is not ${targetWorkflowSource}`,
-      };
-    }
-
     if (workflowStatus !== 'completed' || workflowConclusion !== 'success') {
       return {
         status: 'failure',
@@ -72,14 +78,26 @@ export class FinancerService {
       };
     }
 
-    if (branchName === 'production') {
-      return {
-        status: 'success',
-        message: `@TODO - Deployment should be rolled out to production.`,
-      };
-    } else {
+    if (branchName === 'production' && workflowSource === prodWorkflowSource) {
+      return this.rolloutProdDeployment();
+    } else if (
+      branchName !== 'production' &&
+      workflowSource === devWorkflowSource
+    ) {
       return this.rolloutDevDeployment();
     }
+
+    return {
+      status: 'skipped',
+      message: `Workflow wasn't relevant for any deployment condition`,
+    };
+  }
+
+  private async rolloutProdDeployment() {
+    return this.kubernetesService.rolloutDeployment(
+      'financer',
+      'webapp-deployment',
+    );
   }
 
   private async rolloutDevDeployment() {

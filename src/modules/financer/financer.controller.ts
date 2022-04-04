@@ -19,6 +19,11 @@ export class FinancerController {
     return this.financerService.handleRolloutDevDeployment(authorization);
   }
 
+  @Get('/rollout/prod')
+  async rolloutProdDeployment(@Headers('authorization') authorization: string) {
+    return this.financerService.handleRolloutProdDeployment(authorization);
+  }
+
   @Post('/webhook')
   async webhook(
     @Headers('X-Hub-Signature-256') contentHash: string,
