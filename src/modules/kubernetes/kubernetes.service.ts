@@ -1,5 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class KubernetesService {
