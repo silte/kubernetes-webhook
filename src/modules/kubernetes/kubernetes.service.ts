@@ -1,63 +1,45 @@
-import * as k8s from '@kubernetes/client-node';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { exec } from 'child_process';
+
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class KubernetesService {
-  private readonly kc: k8s.KubeConfig;
-
-  constructor(private configService: ConfigService) {
-    this.kc = new k8s.KubeConfig();
-    if (this.configService.get<string>('kubernetes.configFile')) {
-      this.kc.loadFromFile(
-        this.configService.get<string>('kubernetes.configFile'),
-      );
-    } else if (this.configService.get<boolean>('kubernetes.isInCluster')) {
-      this.kc.loadFromCluster();
-    } else {
-      this.kc.loadFromDefault();
-    }
-  }
+  private readonly logger = new Logger(KubernetesService.name);
 
   async rolloutDeployment(namespace: string, deploymentName: string) {
-    const getPatch = (replicas) => [
-      {
-        op: 'replace',
-        path: '/spec/replicas',
-        value: replicas,
-      },
-    ];
+    return new Promise((resolve, reject) => {
+      const failedReponse = (error: string) => {
+        return this.logger.error(
+          `Deployment ${deploymentName} failed: ${error}`,
+        );
+        reject({
+          status: 'failed',
+          message: 'Deployment failed',
+          error,
+        });
+      };
 
-    const k8sApi = this.kc.makeApiClient(k8s.AppsV1Api);
-    const { body } = await k8sApi.readNamespacedDeployment(
-      deploymentName,
-      namespace,
-    );
+      const successReponse = (info: string) => {
+        this.logger.log(`Deployment ${deploymentName} rolled out: ${info}`);
+        resolve({
+          status: 'success',
+          message: 'Deployment succeeded',
+          info,
+        });
+      };
 
-    await k8sApi.patchNamespacedDeployment(
-      deploymentName,
-      namespace,
-      getPatch(0),
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { headers: { 'content-type': 'application/json-patch+json' } },
-    );
+      exec(
+        `kubectl -n ${namespace} rollout restart deployment ${deploymentName}`,
+        (err, stdout, stderr) => {
+          if (err) {
+            failedReponse(err.message);
+          } else if (stderr) {
+            failedReponse(stderr);
+          }
 
-    await k8sApi.patchNamespacedDeployment(
-      deploymentName,
-      namespace,
-      getPatch(1),
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { headers: { 'content-type': 'application/json-patch+json' } },
-    );
-
-    return {
-      message: 'Deployment rolled out',
-    };
+          successReponse(stdout);
+        },
+      );
+    });
   }
 }
