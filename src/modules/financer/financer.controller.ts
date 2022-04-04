@@ -20,8 +20,10 @@ export class FinancerController {
   }
 
   @Post('/webhook')
-  async webhook(@Body() body: any) {
-    console.log(body);
-    return { status: 'ok' };
+  async webhook(
+    @Headers('X-Hub-Signature-256') contentHash: string,
+    @Body() body: any,
+  ) {
+    return this.financerService.handleWebhook(contentHash, body);
   }
 }
