@@ -10,11 +10,7 @@ export class FinancerService {
     private kubernetesService: KubernetesService,
   ) {}
 
-  async rolloutDevDeployment(
-    namespace: string,
-    deploymentName: string,
-    authorizationToken: string,
-  ) {
+  async handleRolloutDevDeployment(authorizationToken: string) {
     const accessToken = this.configService.get<string>(
       'financer.rollout.accessToken.dev',
     );
@@ -23,6 +19,13 @@ export class FinancerService {
       throw new UnauthorizedException('Incorrect authorization header');
     }
 
-    return this.kubernetesService.rolloutDeployment(namespace, deploymentName);
+    return this.rolloutDevDeployment();
+  }
+
+  private rolloutDevDeployment() {
+    return this.kubernetesService.rolloutDeployment(
+      'financer',
+      'dev-webapp-deployment',
+    );
   }
 }

@@ -9,10 +9,6 @@ export class FinancerController {
 
   @Get('/rollout/dev')
   async rolloutDevDeployment(@Headers('authorization') authorization: string) {
-    return this.financerService.rolloutDevDeployment(
-      'financer',
-      'dev-webapp-deployment',
-      authorization,
-    );
+    return this.financerService.handleRolloutDevDeployment(authorization);
   }
 }
