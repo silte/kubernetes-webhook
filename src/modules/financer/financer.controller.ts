@@ -1,4 +1,11 @@
-import { Controller, Get, Headers, Injectable } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Injectable,
+  Post,
+} from '@nestjs/common';
 
 import { FinancerService } from './financer.service';
 
@@ -10,5 +17,12 @@ export class FinancerController {
   @Get('/rollout/dev')
   async rolloutDevDeployment(@Headers('authorization') authorization: string) {
     return this.financerService.handleRolloutDevDeployment(authorization);
+  }
+
+  @Get('/webhook')
+  @Post('/webhook')
+  async webhook(@Body() body: any) {
+    console.log(body);
+    return { status: 'ok' };
   }
 }
