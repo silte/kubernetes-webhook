@@ -5,10 +5,14 @@ import { Injectable } from '@nestjs/common';
 export class KubernetesService {
   private readonly kc: k8s.KubeConfig;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.kc = new k8s.KubeConfig();
-    if (process.env.KUBECONFIG) {
-      this.kc.loadFromFile(process.env.KUBECONFIG);
+    if (this.configService.get<string>('kubernetes.configFile')) {
+      this.kc.loadFromFile(
+        this.configService.get<string>('kubernetes.configFile'),
+      );
+    } else if (this.configService.get<boolean>('kubernetes.isInCluster')) {
+      this.kc.loadFromCluster();
     } else {
       this.kc.loadFromDefault();
     }
@@ -24,12 +28,12 @@ export class KubernetesService {
     ];
 
     const k8sApi = this.kc.makeApiClient(k8s.AppsV1Api);
-    const { body } = await k8sApi.readNamespacedDeploymentStatus(
+    const { body } = await k8sApi.readNamespacedDeployment(
       deploymentName,
       namespace,
     );
 
-    await k8sApi.patchNamespacedDeploymentScale(
+    await k8sApi.patchNamespacedDeployment(
       deploymentName,
       namespace,
       getPatch(0),
@@ -40,7 +44,7 @@ export class KubernetesService {
       { headers: { 'content-type': 'application/json-patch+json' } },
     );
 
-    await k8sApi.patchNamespacedDeploymentScale(
+    await k8sApi.patchNamespacedDeployment(
       deploymentName,
       namespace,
       getPatch(1),
