@@ -33,11 +33,17 @@ spec:
           ports:
             - containerPort: 3000
               name: webapp
+          env:
+            - name: IS_IN_KUBERNETES_CLUSTER
+              value: 'true'
           envFrom:
             - secretRef:
                 name: webapp-environment-secret
-            - configMapRef:
-                name: webapp-environment-config
+      imagePullSecrets:
+        - name: ghcr-auth-token
+      serviceAccountName: webhook-user
+      automountServiceAccountToken: true
+
 ---
 apiVersion: v1
 kind: Service
