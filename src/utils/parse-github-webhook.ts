@@ -17,12 +17,14 @@ export const isValidGithubWebhookBodyHash = (
   hash: string,
   hashToken: string,
 ): boolean => {
+  const stringBody = typeof body === 'string' ? body : JSON.stringify(body);
+
   const hashToCompare = crypto
     .createHmac('sha1', hashToken)
-    .update(body)
+    .update(stringBody)
     .digest('hex');
 
-  return hash === hashToCompare;
+  return hash === `sha256=${hashToCompare}`;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
