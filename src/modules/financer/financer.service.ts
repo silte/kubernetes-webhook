@@ -43,8 +43,8 @@ export class FinancerService {
   }
 
   async handleWebhook(contentHash: string, body: any) {
-    const devWorkflowSource = '.github/workflows/publish-docker.yaml';
-    const prodWorkflowSource = '.github/workflows/validate-main-branches.yml';
+    const devWorkflowSource = '.github/workflows/build-docker.yml';
+    const prodWorkflowSource = '.github/workflows/push-production.yml';
     const accessToken = this.configService.get<string>(
       'financer.accessToken.webhook',
     );
