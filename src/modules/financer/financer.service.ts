@@ -23,7 +23,7 @@ export class FinancerService {
       'financer.accessToken.rollout.prod',
     );
 
-    if (authorizationToken !== accessToken) {
+    if (!accessToken || authorizationToken !== accessToken) {
       throw new UnauthorizedException('Incorrect authorization header');
     }
 
@@ -35,7 +35,7 @@ export class FinancerService {
       'financer.accessToken.rollout.dev',
     );
 
-    if (accessToken !== authorizationToken) {
+    if (!accessToken || accessToken !== authorizationToken) {
       throw new UnauthorizedException('Incorrect authorization header');
     }
 
@@ -49,7 +49,10 @@ export class FinancerService {
       'financer.accessToken.webhook',
     );
 
-    if (!isValidGithubWebhookBodyHash(body, contentHash, accessToken)) {
+    if (
+      !accessToken ||
+      !isValidGithubWebhookBodyHash(body, contentHash, accessToken)
+    ) {
       throw new UnauthorizedException('Invalid content hash.');
     }
 
