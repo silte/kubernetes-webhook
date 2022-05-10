@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { configuration } from './configuration/configuration';
 import { FinancerModule } from './modules/financer/financer.module';
 import { KubernetesModule } from './modules/kubernetes/kubernetes.module';
+import { WorkoutTrackerModule } from './modules/workout-tracker/workout-tracker.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { KubernetesModule } from './modules/kubernetes/kubernetes.module';
     }),
     KubernetesModule,
     FinancerModule,
+    WorkoutTrackerModule,
   ],
   controllers: [],
 })
