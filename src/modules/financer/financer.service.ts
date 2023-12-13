@@ -81,10 +81,10 @@ export class FinancerService {
       };
     }
 
-    if (branchName === 'production' && workflowSource === prodWorkflowSource) {
+    if (branchName === 'main' && workflowSource === prodWorkflowSource) {
       return this.rolloutProdDeployment();
     } else if (
-      branchName !== 'production' &&
+      branchName !== 'main' &&
       workflowSource === devWorkflowSource
     ) {
       return this.rolloutDevDeployment();
